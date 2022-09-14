@@ -22,7 +22,7 @@ public class MoneyTransferTest {
         val loginPage = new LoginPage();
         val authInfo = DataHelper.getAuthInfo();
         val verificationPage = loginPage.validLogin(authInfo);
-        val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        val verificationCode = DataHelper.getVerificationCode(authInfo);
         return verificationPage.validVerify(verificationCode);
     }
 
@@ -63,7 +63,7 @@ public class MoneyTransferTest {
         val loginPage = new LoginPage();
         val authInfo = DataHelper.getAuthInfo();
         val verificationPage = loginPage.validLogin(authInfo);
-        val badVerificationCode = DataHelper.getOtherVerificationCodeFor(authInfo);
+        val badVerificationCode = DataHelper.getOtherVerificationCode(authInfo);
         verificationPage.invalidVerify(badVerificationCode);
     }
 

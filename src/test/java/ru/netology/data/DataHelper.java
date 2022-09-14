@@ -14,7 +14,6 @@ public class DataHelper {
 
     }
 
-
     @Value
     public static class AuthInfo {
         private String login;
@@ -23,12 +22,12 @@ public class DataHelper {
 
     public static AuthInfo getAuthInfo() {
 
-        return new AuthInfo("Ivan", "1111");
+        return new AuthInfo("vasya", "qwerty123");
     }
 
-    public static AuthInfo getOtherAuthInfo(AuthInfo original) {
+    public static AuthInfo getOtherAuthInfo(AuthInfo authInfo) {
 
-        return new AuthInfo("Anton", "2222");
+        return new AuthInfo("artem", "1111");
     }
 
     @Value
@@ -36,12 +35,12 @@ public class DataHelper {
         private String code;
     }
 
-    public static VerificationCode getVerificationCodeFor(AuthInfo authinfo) {
+    public static VerificationCode getVerificationCode(AuthInfo authinfo) {
 
         return new VerificationCode("12345");
     }
 
-    public static VerificationCode getOtherVerificationCodeFor(AuthInfo authinfo) {
+    public static VerificationCode getOtherVerificationCode(AuthInfo authinfo) {
 
         return new VerificationCode("54321");
     }
