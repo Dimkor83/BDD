@@ -1,6 +1,5 @@
 package ru.netology.page;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import ru.netology.data.DataHelper;
 
@@ -27,9 +26,9 @@ public class VerificationPage {
 
     public void invalidVerify(DataHelper.VerificationCode verificationCode) {
         codeField.setValue(verificationCode.getCode());
-        sleep(15000);
+        sleep(10000);
         verifyButton.click();
-        errorBox.shouldBe(visible, ofSeconds(15));
+        errorBox.shouldBe(visible, ofSeconds(10));
         $("[data-test-id=error-notification]>.notification__title")
                 .shouldHave(text("Ошибка"));
         $("[data-test-id=error-notification]>.notification__content")

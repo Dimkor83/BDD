@@ -3,12 +3,10 @@ package ru.netology.page;
 
         import com.codeborne.selenide.SelenideElement;
         import ru.netology.data.DataHelper;
-        import ru.netology.data.DataHelper;
 
         import java.time.Duration;
 
         import static com.codeborne.selenide.Condition.*;
-        import static com.codeborne.selenide.Selectors.withText;
         import static com.codeborne.selenide.Selenide.$;
         import static com.codeborne.selenide.Selenide.sleep;
 
@@ -28,9 +26,9 @@ public class LoginPage {
     public void invalidLogin(DataHelper.AuthInfo info) {
         loginField.setValue(info.getLogin());
         passwordField.setValue(info.getPassword());
-        sleep(15000);
+        sleep(5000);
         loginButton.click();
-        errorBox.shouldBe(visible, Duration.ofSeconds(5));
+        errorBox.shouldBe(visible, Duration.ofSeconds(10));
         $("[data-test-id=error-notification]>.notification__title")
                 .shouldHave(text("Ошибка"));
         $("[data-test-id=error-notification]>.notification__content")

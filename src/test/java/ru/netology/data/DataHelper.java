@@ -47,7 +47,7 @@ public class DataHelper {
 
     @Value
     public static class CardNumber {
-        private String[] cardsNumbers;
+        private String[] cardNumber;
     }
 
     public static CardNumber getCardsNumbers() {
@@ -55,22 +55,22 @@ public class DataHelper {
     }
 
     public static String findCardPlus() {
-        int lengthOfCardsArray = getCardsNumbers().cardsNumbers.length;
+        int lengthOfCardsArray = getCardsNumbers().cardNumber.length;
         int indexesInCardsArray = lengthOfCardsArray - 1;
         val indexTo = generateIndexForCardPlus(indexesInCardsArray);
-        val cardPlus = getCardsNumbers().getCardsNumbers()[indexTo];
+        val cardPlus = getCardsNumbers().getCardNumber()[indexTo];
         return cardPlus;
     }
 
     public static String findCardMinus(String cardPlus) {
-        val lengthOfCardsArray = getCardsNumbers().cardsNumbers.length;
+        val lengthOfCardsArray = getCardsNumbers().cardNumber.length;
         Random random = new Random();
         int index = random.nextInt(lengthOfCardsArray);
-        int exclusion = Arrays.asList(getCardsNumbers().cardsNumbers).indexOf(cardPlus);
+        int exclusion = Arrays.asList(getCardsNumbers().cardNumber).indexOf(cardPlus);
         while (index == exclusion) {
             index = random.nextInt(lengthOfCardsArray);
         }
-        val cardMinus = getCardsNumbers().getCardsNumbers()[index];
+        val cardMinus = getCardsNumbers().getCardNumber()[index];
         return cardMinus;
     }
 
