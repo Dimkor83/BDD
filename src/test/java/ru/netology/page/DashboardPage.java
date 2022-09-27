@@ -4,38 +4,38 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import lombok.val;
+import ru.netology.data.DataHelper;
 
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static java.time.Duration.ofSeconds;
 
 
 public class DashboardPage {
     private SelenideElement heading = $("[data-test-id=dashboard]");
-    private ElementsCollection cards = $$(".list__item");
+    private ElementsCollection cards = $$(".list__item div");
     private final String balanceStart = "баланс: ";
     private final String balanceFinish = " р.";
 
     public DashboardPage() {
-
         heading.shouldBe(Condition.visible);
     }
 
-    public int getCardsBalance(String lastDigits) {
-        val balance = cards.findBy(Condition.text(lastDigits)).text();
-        val start = balance.indexOf(balanceStart);
-        val finish = balance.indexOf(balanceFinish);
-        val value = balance.substring(start + balanceStart.length(), finish).trim();
+    public int getCardBalance(DataHelper.CardInfo cardInfo) {
+        var text = cards.findBy(text(cardInfo.getCardNumber().substring(12, 16))).getText();
+        return extractBalance(text);
+    }
+
+public TransferPage selectCardToTransfer(DataHelper.CardInfo cardInfo) {
+    cards.findBy(attribute("data-test-id", cardInfo.getTestId())).$("button").click();
+    return new TransferPage();
+}
+
+private int extractBalance(String text) {
+        var start = text.indexOf(balanceStart);
+        var finish = text.indexOf(balanceFinish);
+        var value = text.substring(start + balanceStart.length(), finish);
         return Integer.parseInt(value);
     }
-
-    public UploadPage moneyTransferClickButton(String lastDigits) {
-        val uploadButton = cards.findBy(Condition.text(lastDigits)).$("[data-test-id=action-deposit]");
-        uploadButton.click();
-        return new UploadPage();
-    }
-
 }

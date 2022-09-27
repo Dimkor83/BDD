@@ -1,23 +1,17 @@
 package ru.netology.data;
 
-import com.github.javafaker.Faker;
 import lombok.Value;
-import lombok.val;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class DataHelper {
-    private static Faker faker = new Faker();
 
     private DataHelper() {
 
     }
 
-    @Value
-    public static class AuthInfo {
-        private String login;
-        private String password;
+    public static VerificationCode getVerificationCode() {
+        return new VerificationCode("12345");
     }
 
     public static AuthInfo getAuthInfo() {
@@ -25,71 +19,40 @@ public class DataHelper {
         return new AuthInfo("vasya", "qwerty123");
     }
 
-    public static AuthInfo getOtherAuthInfo(AuthInfo authInfo) {
+    public static AuthInfo getOtherAuthInfo() {
 
-        return new AuthInfo("artem", "1111");
+        return new AuthInfo("artem", "123456789");
+    }
+
+    public static CardInfo getFirstCardInfo() {
+        return new CardInfo ("5559000000000001", "92df3f1c-a033-48e6-8390-206f6b1f56c0");
+    }
+
+    public static CardInfo getSecondCardInfo() {
+        return new CardInfo ("5559000000000002", "0f3f5c2a-249e-4c3d-8287-09f7a039391d");
+    }
+
+    public static int generateValidAmount(int balance) {
+        return new Random().nextInt(balance) +1;
+    }
+
+    public static int generateInvalidAmount(int balance) {return Math.abs(balance)+ new Random().nextInt(10000);}
+
+    @Value
+    public static class AuthInfo {
+        String login;
+        String password;
     }
 
     @Value
     public static class VerificationCode {
-        private String code;
-    }
-
-    public static VerificationCode getVerificationCode(AuthInfo authinfo) {
-
-        return new VerificationCode("12345");
-    }
-
-    public static VerificationCode getOtherVerificationCode(AuthInfo authinfo) {
-
-        return new VerificationCode("54321");
+        String code;
     }
 
     @Value
-    public static class CardNumber {
-        private String[] cardNumber;
+    public static class CardInfo {
+        String cardNumber;
+        String testId;
     }
 
-    public static CardNumber getCardsNumbers() {
-        return new CardNumber(new String[]{"5559 0000 0000 0001", "5559 0000 0000 0002"});
-    }
-
-    public static String findCardPlus() {
-        int lengthOfCardsArray = getCardsNumbers().cardNumber.length;
-        int indexesInCardsArray = lengthOfCardsArray - 1;
-        val indexTo = generateIndexForCardPlus(indexesInCardsArray);
-        val cardPlus = getCardsNumbers().getCardNumber()[indexTo];
-        return cardPlus;
-    }
-
-    public static String findCardMinus(String cardPlus) {
-        val lengthOfCardsArray = getCardsNumbers().cardNumber.length;
-        Random random = new Random();
-        int index = random.nextInt(lengthOfCardsArray);
-        int exclusion = Arrays.asList(getCardsNumbers().cardNumber).indexOf(cardPlus);
-        while (index == exclusion) {
-            index = random.nextInt(lengthOfCardsArray);
-        }
-        val cardMinus = getCardsNumbers().getCardNumber()[index];
-        return cardMinus;
-    }
-
-    public static String getLastDigits(String cardNumber) {
-        String lastDigits = cardNumber.substring(cardNumber.length() - 4);
-        return lastDigits;
-    }
-
-    public static int generateIndexForCardPlus(int limit) {
-        int transferToCard = faker.random().nextInt(0, limit);
-        return transferToCard;
-    }
-
-    public static int generateTransferAmountInLimit(int limit) {
-        return faker.random().nextInt(1, limit);
-    }
-
-    public static int generateTransferAmountOutLimit(int limit) {
-        return faker.random().nextInt(limit + 1, limit+ 10000);
-    }
 }
-

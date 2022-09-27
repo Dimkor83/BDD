@@ -1,10 +1,7 @@
 package ru.netology.test;
 
-import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.DataHelper;
-import ru.netology.page.DashboardPage;
 import ru.netology.page.LoginPage;
 
 import static com.codeborne.selenide.Selenide.open;
@@ -12,78 +9,53 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MoneyTransferTest {
 
-    @BeforeEach
-    void setUp() {
-        open("http://localhost:9999");
-    }
-
-    //Метод для входа в личный кабинет
-    private DashboardPage validAuthorization() {
-        val loginPage = new LoginPage();
-        val authInfo = DataHelper.getAuthInfo();
-        val verificationPage = loginPage.validLogin(authInfo);
-        val verificationCode = DataHelper.getVerificationCode(authInfo);
-        return verificationPage.validVerify(verificationCode);
+    @Test
+    void shouldTransferFromFirstToSecond() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCode();
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+        var firstCardInfo = DataHelper.getFirstCardInfo();
+        var secondCardInfo = DataHelper.getSecondCardInfo();
+        var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
+        var amount = DataHelper.generateValidAmount(firstCardBalance);
+        var expectedBalanceFirstCard = firstCardBalance - amount;
+        var expectedBalanceSecondCard = secondCardBalance + amount;
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        dashboardPage = transferPage.makeValidTransfer(String.valueOf(amount), firstCardInfo);
+        var actualBalanceFirstCard = dashboardPage.getCardBalance(firstCardInfo);
+        var actualBalanceSecondCard = dashboardPage.getCardBalance(secondCardInfo);
+        assertEquals(expectedBalanceFirstCard, actualBalanceFirstCard);
+        assertEquals(expectedBalanceSecondCard, actualBalanceSecondCard);
     }
 
     @Test
-    void shouldTransferMoneyBetweenRandomCardsWithinLimit() {
-        //загружаем личный кабинет используя валидные данные и получаем рандомные карты для транзакций
-        val dashboardPage = validAuthorization();
-        val cardPlusFull = DataHelper.findCardPlus();
-        val cardMinusFull = DataHelper.findCardMinus(cardPlusFull);
-
-        //производим между выбранными картами перевод рандомной суммы в пределах суммы, имеющейся на карте
-        val initialBalanceCardPlus = dashboardPage.getCardsBalance(DataHelper.getLastDigits(cardPlusFull));
-        val initialBalanceCardMinus = dashboardPage.getCardsBalance(DataHelper.getLastDigits(cardMinusFull));
-        val uploadAmount = DataHelper.generateTransferAmountInLimit(initialBalanceCardMinus);
-        val uploadPage = dashboardPage.moneyTransferClickButton(DataHelper.getLastDigits(cardPlusFull));
-        val dashboardPage2 = uploadPage.shouldTransferMoneyBetweenCards(uploadAmount, cardMinusFull);
-        val actualBalanceCardPlus = dashboardPage2.getCardsBalance(DataHelper.getLastDigits(cardPlusFull));
-        val actualBalanceCardMinus = dashboardPage2.getCardsBalance(DataHelper.getLastDigits(cardMinusFull));
-        assertEquals(initialBalanceCardPlus + uploadAmount, actualBalanceCardPlus);
-        assertEquals(initialBalanceCardMinus - uploadAmount, actualBalanceCardMinus);
-
-        //Теперь возвращаем баланс карт к исходному
-        val uploadPage2 = dashboardPage2.moneyTransferClickButton(DataHelper.getLastDigits(cardMinusFull));
-        val dashboardPage3 = uploadPage2.shouldTransferMoneyBetweenCards(uploadAmount, cardPlusFull);
-        assertEquals(initialBalanceCardPlus, dashboardPage3.getCardsBalance(DataHelper.getLastDigits(cardPlusFull)));
-        assertEquals(initialBalanceCardMinus, dashboardPage3.getCardsBalance(DataHelper.getLastDigits(cardMinusFull)));
+    void shouldGetErrorMessageIfAmountMoreBalance() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCode();
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+        var firstCardInfo = DataHelper.getFirstCardInfo();
+        var secondCardInfo = DataHelper.getSecondCardInfo();
+        var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
+        var amount = DataHelper.generateInvalidAmount(secondCardBalance);
+        var transferPage = dashboardPage.selectCardToTransfer(firstCardInfo);
+        transferPage.makeTransfer(String.valueOf(amount), secondCardInfo);
+        transferPage.findErrorMessage("Недостаточно средств на карте");
+        var actualBalanceFirstCard = dashboardPage.getCardBalance(firstCardInfo);
+        var actualBalanceSecondCard = dashboardPage.getCardBalance(secondCardInfo);
+        assertEquals(firstCardBalance, actualBalanceFirstCard);
+        assertEquals(secondCardBalance, actualBalanceSecondCard);
     }
 
     @Test
-    void shouldFailToAuthorizeWithInvalidAuthData() {
-        val loginPage = new LoginPage();
-        val badAuthInfo = DataHelper.getOtherAuthInfo(DataHelper.getAuthInfo());
-        loginPage.invalidLogin(badAuthInfo);
+    void shouldGetErrorMessageIfEnterInvalidVerify() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.getOtherAuthInfo();
+       loginPage.invalidLogin(authInfo);
     }
-
-    @Test
-    void shouldFailToAuthorizeWithInvalidVerificationCode() {
-        val loginPage = new LoginPage();
-        val authInfo = DataHelper.getAuthInfo();
-        val verificationPage = loginPage.validLogin(authInfo);
-        val badVerificationCode = DataHelper.getOtherVerificationCode(authInfo);
-        verificationPage.invalidVerify(badVerificationCode);
     }
-
-    @Test
-    void shouldFailToTransferMoneyFromFirstCardToSecondIfOutOfLimit() {
-        //загружаем личный кабинет используя валидные данные и получаем рандомные карты для транзакций
-        val dashboardPage = validAuthorization();
-        val cardPlusFull = DataHelper.findCardPlus();
-        val cardMinusFull = DataHelper.findCardMinus(cardPlusFull);
-        //производим между выбранными картами перевод рандомной суммы за пределами баланса карты, с которой производится перевод
-        val initialBalanceCardPlus = dashboardPage.getCardsBalance(DataHelper.getLastDigits(cardPlusFull));
-        val initialBalanceCardMinus = dashboardPage.getCardsBalance(DataHelper.getLastDigits(cardMinusFull));
-        val uploadAmount = DataHelper.generateTransferAmountOutLimit(initialBalanceCardMinus);
-        val uploadPage = dashboardPage.moneyTransferClickButton(DataHelper.getLastDigits(cardPlusFull));
-        uploadPage.shouldWarnThatTransferAmountIsOutLimit(uploadAmount, cardMinusFull);
-        setUp();
-        val dashboardPage2 = validAuthorization();
-        val actualBalanceCardPlus = dashboardPage2.getCardsBalance(DataHelper.getLastDigits(cardPlusFull));
-        val actualBalanceCardMinus = dashboardPage2.getCardsBalance(DataHelper.getLastDigits(cardMinusFull));
-        assertEquals(initialBalanceCardPlus, actualBalanceCardPlus);
-        assertEquals(initialBalanceCardMinus, actualBalanceCardMinus);
-    }
-}
