@@ -53,9 +53,18 @@ public class MoneyTransferTest {
     }
 
     @Test
-    void shouldGetErrorMessageIfEnterInvalidVerify() {
+    void shouldGetErrorMessageIfEnterInvalidLogin() {
         var loginPage = open("http://localhost:9999", LoginPage.class);
         var authInfo = DataHelper.getOtherAuthInfo();
-       loginPage.invalidLogin(authInfo);
+        loginPage.invalidLogin(authInfo);
     }
+
+    @Test
+    void shouldGetErrorMessageIfEnterInvalidVerify() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCode();
+        verificationPage.invalidVerify(verificationCode);
     }
+}

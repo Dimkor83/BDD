@@ -27,12 +27,12 @@ public class DashboardPage {
         return extractBalance(text);
     }
 
-public TransferPage selectCardToTransfer(DataHelper.CardInfo cardInfo) {
-    cards.findBy(attribute("data-test-id", cardInfo.getTestId())).$("button").click();
-    return new TransferPage();
-}
+    public TransferPage selectCardToTransfer(DataHelper.CardInfo cardInfo) {
+        cards.findBy(attribute("data-test-id", cardInfo.getTestId())).$("button").click();
+        return new TransferPage();
+    }
 
-private int extractBalance(String text) {
+    private int extractBalance(String text) {
         var start = text.indexOf(balanceStart);
         var finish = text.indexOf(balanceFinish);
         var value = text.substring(start + balanceStart.length(), finish);

@@ -1,33 +1,34 @@
 
 package ru.netology.page;
 
-        import com.codeborne.selenide.SelenideElement;
-        import ru.netology.data.DataHelper;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+import ru.netology.data.DataHelper;
 
-        import java.time.Duration;
+import java.time.Duration;
 
-        import static com.codeborne.selenide.Condition.*;
-        import static com.codeborne.selenide.Selenide.$;
-        import static com.codeborne.selenide.Selenide.sleep;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
     private SelenideElement loginField = $("[data-test-id=login] input");
     private SelenideElement passwordField = $("[data-test-id=password] input");
     private SelenideElement loginButton = $("[data-test-id=action-login]");
-    private SelenideElement errorBox  = $("[data-test-id=error-notification]");
+    private SelenideElement errorBox = $("[data-test-id=error-notification]");
 
-    public VerificationPage validLogin(DataHelper.AuthInfo info) {
+    public void FillingOutTheForm(DataHelper.AuthInfo info) {
         loginField.setValue(info.getLogin());
         passwordField.setValue(info.getPassword());
         loginButton.click();
+    }
+
+    public VerificationPage validLogin(DataHelper.AuthInfo info) {
+        FillingOutTheForm(info);
         return new VerificationPage();
     }
 
     public void invalidLogin(DataHelper.AuthInfo info) {
-        loginField.setValue(info.getLogin());
-        passwordField.setValue(info.getPassword());
-        sleep(5000);
-        loginButton.click();
+        FillingOutTheForm(info);
         errorBox.shouldBe(visible, Duration.ofSeconds(10));
         $("[data-test-id=error-notification]>.notification__title")
                 .shouldHave(text("Ошибка"));

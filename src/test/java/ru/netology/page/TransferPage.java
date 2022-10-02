@@ -21,7 +21,7 @@ public class TransferPage {
         addMoneyHeading.shouldBe(visible, ofSeconds(10));
     }
 
-    public DashboardPage makeValidTransfer (String amountToTransfer, DataHelper.CardInfo cardinfo) {
+    public DashboardPage makeValidTransfer(String amountToTransfer, DataHelper.CardInfo cardinfo) {
         makeTransfer(amountToTransfer, cardinfo);
         return new DashboardPage();
     }
@@ -33,7 +33,7 @@ public class TransferPage {
     }
 
     public void findErrorMessage(String expectedText) {
-        errorBox.shouldHave(exactText(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
+        errorBox.shouldBe(exactText(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
     }
 
 }
